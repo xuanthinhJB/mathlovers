@@ -122,15 +122,15 @@ export default function ProvidersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">AI provider</h1>
-      <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">
+      <h1 className="text-[26px] font-semibold tracking-tight">AI provider</h1>
+      <p className="mt-1.5 max-w-2xl text-[var(--muted)]">
         <strong>Gợi ý (text)</strong> sinh gợi ý cho học sinh — mặc định DeepSeek.{" "}
         <strong>Đọc ảnh (vision)</strong> dùng cho chức năng chụp đề. DeepSeek hiện chủ yếu là
         model text, nên nếu muốn dùng camera hãy thêm một provider vision như Gemini hoặc OpenAI.
       </p>
 
       <form onSubmit={save} className="card mt-6 p-5">
-        <h2 className="font-bold">{editing ? "Sửa provider" : "Thêm provider"}</h2>
+        <h2 className="text-[15px] font-semibold">{editing ? "Sửa provider" : "Thêm provider"}</h2>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
@@ -282,7 +282,7 @@ export default function ProvidersPage() {
 
       {(["text", "vision"] as ProviderRole[]).map((role) => (
         <section key={role} className="mt-8">
-          <h2 className="font-bold">
+          <h2 className="text-[15px] font-semibold">
             {role === "text" ? "Provider gợi ý" : "Provider đọc ảnh"}
           </h2>
           {byRole(role).length === 0 ? (
@@ -308,13 +308,13 @@ export default function ProvidersPage() {
                       {r.has_key ? `key ${r.key_preview}` : "chưa có API key"}
                     </div>
                   </div>
-                  <button type="button" className="btn btn-ghost !py-1.5 !text-sm" onClick={() => test(r.id)} disabled={busy}>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => test(r.id)} disabled={busy}>
                     Kiểm tra
                   </button>
-                  <button type="button" className="btn btn-ghost !py-1.5 !text-sm" onClick={() => edit(r)}>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => edit(r)}>
                     Sửa
                   </button>
-                  <button type="button" className="btn btn-danger !py-1.5 !text-sm" onClick={() => remove(r.id)} disabled={busy}>
+                  <button type="button" className="btn btn-danger btn-sm" onClick={() => remove(r.id)} disabled={busy}>
                     Xoá
                   </button>
                 </div>

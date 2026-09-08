@@ -42,8 +42,8 @@ export default async function StudentsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Học sinh</h1>
-      <p className="mt-1 text-sm text-[var(--muted)]">
+      <h1 className="text-[26px] font-semibold tracking-tight">Học sinh</h1>
+      <p className="mt-1.5 text-[var(--muted)]">
         Tài khoản học sinh đã đăng ký và số lượt các em xin gợi ý.
       </p>
 

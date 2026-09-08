@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import AuthShell from "@/components/AuthShell";
 
 export default function SetupPage() {
   const [hasAdmin, setHasAdmin] = useState<boolean | null>(null);
@@ -38,93 +39,89 @@ export default function SetupPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-5">
-      <Link href="/" className="mb-6 text-sm font-bold text-[var(--accent)]">
-        ← MathLovers
-      </Link>
-      <div className="card p-6">
-        <h1 className="text-xl font-bold">Thiết lập tài khoản quản trị</h1>
+    <AuthShell title="Thiết lập quản trị" subtitle="Chỉ chạy được khi hệ thống chưa có admin nào.">
+      {hasAdmin === null && <p className="text-sm text-[var(--muted)]">Đang kiểm tra…</p>}
 
-        {hasAdmin === true && !msg && (
-          <p className="mt-3 text-sm text-[var(--muted)]">
-            Hệ thống đã có quản trị viên.{" "}
-            <Link href="/dang-nhap" className="underline">
-              Đăng nhập tại đây
-            </Link>
-            .
-          </p>
-        )}
+      {hasAdmin === true && (
+        <p className="text-sm text-[var(--muted)]">
+          {msg ? (
+            <span className="text-[var(--accent)]">{msg} </span>
+          ) : (
+            "Hệ thống đã có quản trị viên. "
+          )}
+          <Link href="/dang-nhap" className="font-medium text-[var(--accent)] underline underline-offset-2">
+            Đăng nhập tại đây
+          </Link>
+          .
+        </p>
+      )}
 
-        {hasAdmin === false && (
-          <form onSubmit={submit} className="mt-5 space-y-4">
-            <div>
-              <label className="label" htmlFor="fullName">
-                Họ tên
-              </label>
-              <input
-                id="fullName"
-                className="field"
-                value={form.fullName}
-                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="label" htmlFor="email">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                className="field"
-                required
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="label" htmlFor="password">
-                Mật khẩu (tối thiểu 8 ký tự)
-              </label>
-              <input
-                id="password"
-                type="password"
-                className="field"
-                required
-                minLength={8}
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="label" htmlFor="setupCode">
-                Mã thiết lập (biến môi trường ADMIN_SETUP_CODE)
-              </label>
-              <input
-                id="setupCode"
-                className="field"
-                required
-                value={form.setupCode}
-                onChange={(e) => setForm({ ...form, setupCode: e.target.value })}
-              />
-            </div>
+      {hasAdmin === false && (
+        <form onSubmit={submit}>
+          <div>
+            <label className="label" htmlFor="fullName">
+              Họ tên
+            </label>
+            <input
+              id="fullName"
+              className="field"
+              value={form.fullName}
+              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+            />
+          </div>
+          <div className="mt-4">
+            <label className="label" htmlFor="email">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              className="field"
+              required
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </div>
+          <div className="mt-4">
+            <label className="label" htmlFor="password">
+              Mật khẩu
+            </label>
+            <input
+              id="password"
+              type="password"
+              className="field"
+              required
+              minLength={8}
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
+            <p className="hint-text">Tối thiểu 8 ký tự.</p>
+          </div>
+          <div className="mt-4">
+            <label className="label" htmlFor="setupCode">
+              Mã thiết lập
+            </label>
+            <input
+              id="setupCode"
+              className="field"
+              required
+              value={form.setupCode}
+              onChange={(e) => setForm({ ...form, setupCode: e.target.value })}
+            />
+            <p className="hint-text">Giá trị của biến môi trường ADMIN_SETUP_CODE.</p>
+          </div>
 
-            {error && <p className="text-sm text-[var(--danger)]">{error}</p>}
+          {error && (
+            <p className="mt-4 rounded-lg bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
+              {error}
+            </p>
+          )}
 
-            <button type="submit" className="btn btn-primary w-full" disabled={loading}>
-              {loading ? "Đang tạo…" : "Tạo tài khoản"}
-            </button>
-          </form>
-        )}
-
-        {msg && (
-          <p className="mt-4 text-sm text-[var(--accent)]">
-            {msg}{" "}
-            <Link href="/dang-nhap" className="underline">
-              Đăng nhập
-            </Link>
-          </p>
-        )}
-      </div>
-    </main>
+          <button type="submit" className="btn btn-primary mt-6 w-full !rounded-lg" disabled={loading}>
+            {loading ? "Đang tạo…" : "Tạo tài khoản quản trị"}
+          </button>
+        </form>
+      )}
+    </AuthShell>
   );
 }

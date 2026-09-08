@@ -1,64 +1,128 @@
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { IconBook, IconChip, IconSliders, IconUsers } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
 
-async function counts() {
+async function stats() {
   const db = supabaseAdmin();
-  const [problems, sessions, providers] = await Promise.all([
-    db.from("problems").select("*", { count: "exact", head: true }),
+  const [problems, sessions, students, textProvider, visionProvider] = await Promise.all([
+    db.from("problems").select("*", { count: "exact", head: true }).eq("is_active", true),
     db.from("study_sessions").select("*", { count: "exact", head: true }),
-    db.from("ai_providers").select("*", { count: "exact", head: true }).eq("is_active", true),
+    db.from("profiles").select("*", { count: "exact", head: true }).eq("role", "student"),
+    db
+      .from("ai_providers")
+      .select("name, model, api_key")
+      .eq("role", "text")
+      .eq("is_active", true)
+      .order("is_default", { ascending: false })
+      .limit(1),
+    db
+      .from("ai_providers")
+      .select("name, model, api_key")
+      .eq("role", "vision")
+      .eq("is_active", true)
+      .order("is_default", { ascending: false })
+      .limit(1),
   ]);
+
+  const text = textProvider.data?.[0];
+  const vision = visionProvider.data?.[0];
   return {
     problems: problems.count ?? 0,
     sessions: sessions.count ?? 0,
-    providers: providers.count ?? 0,
+    students: students.count ?? 0,
+    text: text ? { label: `${text.name} · ${text.model}`, ready: Boolean(text.api_key) } : null,
+    vision: vision
+      ? { label: `${vision.name} · ${vision.model}`, ready: Boolean(vision.api_key) }
+      : null,
   };
 }
 
 export default async function AdminHome() {
-  const c = await counts();
+  const s = await stats();
+
   const cards = [
-    { label: "Bài toán đã soạn", value: c.problems, href: "/admin/problems" },
-    { label: "Lượt học sinh dùng", value: c.sessions, href: "/admin/students" },
-    { label: "AI provider đang bật", value: c.providers, href: "/admin/providers" },
+    { label: "Bài toán đang hiển thị", value: s.problems, href: "/admin/problems", icon: <IconBook /> },
+    { label: "Học sinh đã đăng ký", value: s.students, href: "/admin/students", icon: <IconUsers /> },
+    { label: "Lượt xin gợi ý", value: s.sessions, href: "/admin/students", icon: <IconSliders /> },
+  ];
+
+  const checks = [
+    {
+      title: "Provider gợi ý",
+      ok: Boolean(s.text?.ready),
+      detail: s.text
+        ? s.text.ready
+          ? s.text.label
+          : `${s.text.label} — thiếu API key`
+        : "Chưa cấu hình",
+      href: "/admin/providers",
+    },
+    {
+      title: "Provider đọc ảnh",
+      ok: Boolean(s.vision?.ready),
+      detail: s.vision
+        ? s.vision.ready
+          ? s.vision.label
+          : `${s.vision.label} — thiếu API key`
+        : "Chưa cấu hình — nút chụp ảnh sẽ báo lỗi",
+      href: "/admin/providers",
+    },
+    {
+      title: "Bài toán",
+      ok: s.problems > 0,
+      detail: s.problems > 0 ? `${s.problems} bài đang hiển thị` : "Chưa soạn bài nào",
+      href: "/admin/problems",
+    },
   ];
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Tổng quan</h1>
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        {cards.map((x) => (
-          <Link key={x.label} href={x.href} className="card p-5 transition hover:border-[var(--accent)]">
-            <div className="text-3xl font-bold">{x.value}</div>
-            <div className="mt-1 text-sm text-[var(--muted)]">{x.label}</div>
+      <h1 className="text-[26px] font-semibold tracking-tight">Tổng quan</h1>
+      <p className="mt-1.5 text-[var(--muted)]">Tình trạng hệ thống và số liệu sử dụng.</p>
+
+      <div className="mt-7 grid gap-3 sm:grid-cols-3">
+        {cards.map((c) => (
+          <Link
+            key={c.label}
+            href={c.href}
+            className="card p-5 transition-colors hover:border-[var(--accent-line)]"
+          >
+            <span className="text-[var(--muted)]">{c.icon}</span>
+            <div className="mt-2 text-[30px] font-semibold leading-none tracking-tight">
+              {c.value}
+            </div>
+            <div className="mt-1.5 text-[13.5px] text-[var(--muted)]">{c.label}</div>
           </Link>
         ))}
       </div>
 
-      <div className="card mt-8 p-5">
-        <h2 className="font-bold">Bắt đầu từ đâu</h2>
-        <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-[var(--muted)]">
-          <li>
-            <Link href="/admin/providers" className="underline">
-              Cấu hình AI provider
-            </Link>{" "}
-            — dán API key DeepSeek cho phần gợi ý, và thêm một provider “Đọc ảnh” nếu muốn dùng camera.
-          </li>
-          <li>
-            <Link href="/admin/settings" className="underline">
-              Chỉnh prompt chung
-            </Link>{" "}
-            — quy tắc “không đưa lời giải” áp dụng cho mọi bài.
-          </li>
-          <li>
-            <Link href="/admin/problems" className="underline">
-              Soạn bài toán
-            </Link>{" "}
-            — mỗi bài có system prompt gợi ý riêng.
-          </li>
-        </ol>
+      <h2 className="mt-10 text-lg font-semibold tracking-tight">Sẵn sàng hoạt động?</h2>
+      <div className="card mt-3 divide-y divide-[var(--line)]">
+        {checks.map((c) => (
+          <Link
+            key={c.title}
+            href={c.href}
+            className="flex items-center gap-3 p-4 transition-colors hover:bg-[var(--surface-2)]"
+          >
+            <span
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[13px] font-bold ${
+                c.ok
+                  ? "bg-[var(--accent-soft)] text-[var(--accent)]"
+                  : "bg-[var(--danger-soft)] text-[var(--danger)]"
+              }`}
+              aria-hidden
+            >
+              {c.ok ? "✓" : "!"}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="text-[14.5px] font-medium">{c.title}</div>
+              <div className="truncate text-[13px] text-[var(--muted)]">{c.detail}</div>
+            </div>
+            <IconChip className="shrink-0 text-[var(--faint)]" size={16} />
+          </Link>
+        ))}
       </div>
     </div>
   );

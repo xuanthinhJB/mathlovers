@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import AuthShell from "@/components/AuthShell";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 
 export default function LoginPage() {
@@ -39,17 +40,20 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-5 py-10">
-      <Link href="/" className="mb-6 text-sm font-bold text-[var(--accent)]">
-        ← MathLovers
-      </Link>
-      <form onSubmit={submit} className="card p-6">
-        <h1 className="text-xl font-bold">Đăng nhập</h1>
-        <p className="mt-1 text-sm text-[var(--muted)]">
-          Hệ thống sẽ tự đưa bạn tới đúng giao diện.
-        </p>
-
-        <div className="mt-5">
+    <AuthShell
+      title="Đăng nhập"
+      subtitle="Hệ thống sẽ tự đưa bạn tới đúng giao diện."
+      footer={
+        <>
+          Chưa có tài khoản?{" "}
+          <Link href="/dang-ky" className="font-medium text-[var(--accent)] underline underline-offset-2">
+            Đăng ký cho học sinh
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={submit}>
+        <div>
           <label className="label" htmlFor="email">
             Email
           </label>
@@ -78,24 +82,22 @@ export default function LoginPage() {
           />
         </div>
 
-        {error && <p className="mt-4 text-sm text-[var(--danger)]">{error}</p>}
+        {error && (
+          <p className="mt-4 rounded-lg bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
+            {error}
+          </p>
+        )}
 
-        <button type="submit" className="btn btn-primary mt-6 w-full" disabled={loading}>
+        <button type="submit" className="btn btn-primary mt-6 w-full !rounded-lg" disabled={loading}>
           {loading ? "Đang đăng nhập…" : "Đăng nhập"}
         </button>
 
-        <p className="mt-5 text-center text-sm text-[var(--muted)]">
-          Chưa có tài khoản?{" "}
-          <Link href="/dang-ky" className="font-semibold text-[var(--accent)] underline">
-            Đăng ký cho học sinh
-          </Link>
-        </p>
-        <p className="mt-2 text-center text-xs text-[var(--muted)]">
-          <Link href="/thiet-lap" className="underline">
+        <p className="mt-4 text-center text-[12.5px] text-[var(--faint)]">
+          <Link href="/thiet-lap" className="underline underline-offset-2">
             Thiết lập tài khoản quản trị lần đầu
           </Link>
         </p>
       </form>
-    </main>
+    </AuthShell>
   );
 }

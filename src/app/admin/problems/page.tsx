@@ -136,14 +136,14 @@ export default function ProblemsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Bài toán &amp; prompt gợi ý</h1>
-      <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">
+      <h1 className="text-[26px] font-semibold tracking-tight">Bài toán &amp; prompt gợi ý</h1>
+      <p className="mt-1.5 max-w-2xl text-[var(--muted)]">
         Mỗi bài có system prompt gợi ý riêng. Đáp án chỉ dùng để AI tự đối chiếu — không bao giờ
         được đưa cho học sinh.
       </p>
 
       <form onSubmit={save} className="card mt-6 p-5">
-        <h2 className="font-bold">{editing ? "Sửa bài toán" : "Thêm bài toán"}</h2>
+        <h2 className="text-[15px] font-semibold">{editing ? "Sửa bài toán" : "Thêm bài toán"}</h2>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
@@ -288,7 +288,7 @@ export default function ProblemsPage() {
       </form>
 
       <section className="card mt-6 p-5">
-        <h2 className="font-bold">Chủ đề</h2>
+        <h2 className="text-[15px] font-semibold">Chủ đề</h2>
         <div className="mt-3 flex flex-wrap gap-2">
           {topics.map((t) => (
             <span
@@ -313,7 +313,7 @@ export default function ProblemsPage() {
       </section>
 
       <section className="mt-8">
-        <h2 className="font-bold">Danh sách bài toán ({problems.length})</h2>
+        <h2 className="text-[15px] font-semibold">Danh sách bài toán ({problems.length})</h2>
         <div className="mt-3 space-y-3">
           {problems.map((p) => (
             <div key={p.id} className="card flex flex-wrap items-start gap-3 p-4">
@@ -332,12 +332,12 @@ export default function ProblemsPage() {
                   <p className="mt-2 line-clamp-2 text-sm text-[var(--muted)]">{p.statement}</p>
                 )}
               </div>
-              <button type="button" className="btn btn-ghost !py-1.5 !text-sm" onClick={() => edit(p)}>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => edit(p)}>
                 Sửa
               </button>
               <button
                 type="button"
-                className="btn btn-danger !py-1.5 !text-sm"
+                className="btn btn-danger btn-sm"
                 onClick={() => remove(p.id)}
                 disabled={busy}
               >

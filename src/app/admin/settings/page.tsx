@@ -49,8 +49,8 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Prompt chung</h1>
-      <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">
+      <h1 className="text-[26px] font-semibold tracking-tight">Prompt chung</h1>
+      <p className="mt-1.5 max-w-2xl text-[var(--muted)]">
         Áp dụng cho mọi bài toán. Prompt riêng của từng bài sẽ được nối thêm phía sau. Hệ thống
         luôn tự động chèn một lớp rào chắn cấm đưa lời giải, không thể tắt.
       </p>
