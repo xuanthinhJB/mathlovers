@@ -21,7 +21,7 @@ export default async function AdminHome() {
   const c = await counts();
   const cards = [
     { label: "Bài toán đã soạn", value: c.problems, href: "/admin/problems" },
-    { label: "Lượt học sinh dùng", value: c.sessions, href: "/admin/problems" },
+    { label: "Lượt học sinh dùng", value: c.sessions, href: "/admin/students" },
     { label: "AI provider đang bật", value: c.providers, href: "/admin/providers" },
   ];
 

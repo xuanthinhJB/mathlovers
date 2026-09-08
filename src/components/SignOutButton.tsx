@@ -8,7 +8,7 @@ export default function SignOutButton() {
   return (
     <button
       type="button"
-      className="btn btn-ghost !py-1 !text-sm"
+      className="btn btn-ghost !py-1.5 !text-sm"
       onClick={async () => {
         await supabaseBrowser().auth.signOut();
         router.push("/dang-nhap");

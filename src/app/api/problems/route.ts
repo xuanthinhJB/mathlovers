@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { listActiveProblems, listTopics } from "@/lib/data";
+import { requireUser } from "@/lib/guard";
 
 export const dynamic = "force-dynamic";
 
-/** Danh sách bài toán công khai cho học sinh — KHÔNG trả về prompt/đáp án. */
+/** Danh sách bài toán cho học sinh đã đăng nhập — KHÔNG trả về prompt/đáp án. */
 export async function GET() {
   try {
+    const { response } = await requireUser();
+    if (response) return response;
+
     const [problems, topics] = await Promise.all([listActiveProblems(), listTopics()]);
     return NextResponse.json({
       topics,

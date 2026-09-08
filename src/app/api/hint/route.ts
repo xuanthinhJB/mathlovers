@@ -3,23 +3,25 @@ import { callAi } from "@/lib/ai";
 import { getDefaultProvider, getProblem, getSettings } from "@/lib/data";
 import { buildSystemPrompt } from "@/lib/prompt";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { requireUser } from "@/lib/guard";
 import type { ChatTurn } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 interface Body {
-  anonId: string;
   sessionId?: string | null;
   problemId?: string | null;
   problemText: string;
   history: ChatTurn[];
   hintLevel: number;
-  studentLabel?: string | null;
 }
 
 export async function POST(req: Request) {
   try {
+    const { user, response } = await requireUser();
+    if (response) return response;
+
     const body = (await req.json()) as Body;
     const problemText = (body.problemText ?? "").slice(0, 6000);
     const history = (body.history ?? []).slice(-16);
@@ -68,8 +70,9 @@ export async function POST(req: Request) {
         const { data } = await db
           .from("study_sessions")
           .insert({
-            anon_id: body.anonId || "unknown",
-            student_label: body.studentLabel ?? null,
+            user_id: user!.id,
+            anon_id: null,
+            student_label: user!.full_name ?? user!.email,
             problem_id: body.problemId ?? null,
             input_mode: "text",
             problem_text: problemText,

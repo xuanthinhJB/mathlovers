@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Markdown from "@/components/Markdown";
 import CameraCapture, { fileToDataUrl } from "./CameraCapture";
+import SignOutButton from "@/components/SignOutButton";
 
 interface PublicProblem {
   id: string;
@@ -19,23 +20,19 @@ interface Turn {
   content: string;
 }
 
-function anonId() {
-  const KEY = "ml_anon_id";
-  let id = localStorage.getItem(KEY);
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem(KEY, id);
-  }
-  return id;
-}
-
 const DIFF_LABEL: Record<string, string> = {
   easy: "Dễ",
   medium: "Vừa",
   hard: "Khó",
 };
 
-export default function StudentApp() {
+export default function StudentApp({
+  displayName,
+  isAdmin,
+}: {
+  displayName: string;
+  isAdmin: boolean;
+}) {
   const [problems, setProblems] = useState<PublicProblem[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
   const [problemText, setProblemText] = useState("");
@@ -127,7 +124,6 @@ export default function StudentApp() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          anonId: anonId(),
           sessionId,
           problemId: selectedId || null,
           problemText,
@@ -171,15 +167,26 @@ export default function StudentApp() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 pb-32 pt-6">
-      <header className="mb-6 flex items-center justify-between">
-        <Link href="/" className="text-sm font-bold text-[var(--accent)]">
-          ← MathLovers
-        </Link>
-        {started && (
-          <button type="button" className="btn btn-ghost !py-1.5 !text-sm" onClick={resetConversation}>
-            Bài mới
-          </button>
-        )}
+      <header className="mb-6 flex flex-wrap items-center gap-3">
+        <span className="text-sm font-bold text-[var(--accent)]">MathLovers</span>
+        <span className="text-sm text-[var(--muted)]">Chào {displayName}</span>
+        <div className="ml-auto flex items-center gap-2">
+          {isAdmin && (
+            <Link href="/admin" className="btn btn-ghost !py-1.5 !text-sm">
+              Trang quản trị
+            </Link>
+          )}
+          {started && (
+            <button
+              type="button"
+              className="btn btn-ghost !py-1.5 !text-sm"
+              onClick={resetConversation}
+            >
+              Bài mới
+            </button>
+          )}
+          <SignOutButton />
+        </div>
       </header>
 
       {!started && (

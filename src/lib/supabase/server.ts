@@ -1,6 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+export type Role = "admin" | "student";
+
+export interface SessionUser {
+  id: string;
+  email: string;
+  full_name: string | null;
+  role: Role;
+}
+
 export async function supabaseServer() {
   const cookieStore = await cookies();
   return createServerClient(
@@ -17,7 +26,7 @@ export async function supabaseServer() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // được gọi từ Server Component — bỏ qua, middleware sẽ làm mới session
+            // được gọi từ Server Component — proxy sẽ làm mới session
           }
         },
       },
@@ -25,8 +34,8 @@ export async function supabaseServer() {
   );
 }
 
-/** Trả về user nếu đang đăng nhập VÀ có trong bảng admins, ngược lại null. */
-export async function getAdminUser() {
+/** Người dùng đang đăng nhập kèm role, hoặc null nếu chưa đăng nhập. */
+export async function getSessionUser(): Promise<SessionUser | null> {
   const supabase = await supabaseServer();
   const {
     data: { user },
@@ -34,11 +43,21 @@ export async function getAdminUser() {
   if (!user) return null;
 
   const { data } = await supabase
-    .from("admins")
-    .select("user_id, email, full_name")
+    .from("profiles")
+    .select("user_id, email, full_name, role")
     .eq("user_id", user.id)
     .maybeSingle();
 
   if (!data) return null;
-  return { id: user.id, email: user.email ?? data.email, full_name: data.full_name };
+  return {
+    id: user.id,
+    email: user.email ?? data.email,
+    full_name: data.full_name,
+    role: data.role as Role,
+  };
+}
+
+/** Đường dẫn mặc định theo role. */
+export function homeFor(role: Role) {
+  return role === "admin" ? "/admin" : "/hoc";
 }

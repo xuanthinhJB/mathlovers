@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { callAi } from "@/lib/ai";
 import { getDefaultProvider, getSettings } from "@/lib/data";
+import { requireUser } from "@/lib/guard";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -8,6 +9,9 @@ export const maxDuration = 60;
 /** Nhận ảnh (data URL) → trích xuất đề bài toán bằng provider role = 'vision'. */
 export async function POST(req: Request) {
   try {
+    const { response } = await requireUser();
+    if (response) return response;
+
     const { imageDataUrl } = (await req.json()) as { imageDataUrl?: string };
     if (!imageDataUrl?.startsWith("data:image/")) {
       return NextResponse.json({ error: "Ảnh không hợp lệ." }, { status: 400 });

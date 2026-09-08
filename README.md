@@ -5,7 +5,7 @@ Trang web hỗ trợ học sinh học Toán bằng **gợi ý tư duy** — tr�
 
 ## Tính năng
 
-**Học sinh** (`/hoc`) — không cần đăng nhập
+**Học sinh** (`/hoc`) — đăng nhập bằng tài khoản riêng
 - Chọn bài thầy cô đã soạn, hoặc tự gõ đề
 - Chụp ảnh đề bằng camera (hoặc tải ảnh lên) → AI đọc đề thành văn bản
 - Nhận gợi ý theo 4 bậc, trả lời câu hỏi dẫn dắt, xin "gợi ý sâu hơn" khi bí
@@ -47,11 +47,19 @@ cp .env.example .env.local   # điền giá trị thật
 npm run dev
 ```
 
+## Vai trò tài khoản
+
+- Một màn đăng nhập duy nhất `/dang-nhap`. Sau khi đăng nhập, hệ thống đọc `profiles.role` và tự chuyển:
+  `admin` → `/admin`, `student` → `/hoc`. Trang `/` cũng tự đẩy về đúng nơi.
+- Học sinh tự đăng ký tại `/dang-ky` (tạo qua service_role với `email_confirm`, không cần cấu hình SMTP).
+- Quản trị viên xem danh sách học sinh và số lượt hỏi tại `/admin/students`.
+
 ## Thiết lập lần đầu
 
 1. Mở `/thiet-lap`, nhập email + mật khẩu + `ADMIN_SETUP_CODE` → tạo tài khoản quản trị
    (chỉ chạy được khi chưa có admin nào)
-2. Đăng nhập tại `/dang-nhap`
+2. Đăng nhập tại `/dang-nhap` — hệ thống tự đưa tới `/admin`
 3. Vào `/admin/providers` dán API key DeepSeek cho provider mặc định
 4. Muốn dùng camera: thêm một provider vai trò **Đọc ảnh** (Gemini hoặc OpenAI)
 5. Soạn bài tại `/admin/problems`
+6. Gửi học sinh đường dẫn `/dang-ky` để các em tự tạo tài khoản

@@ -3,7 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
-/** Tạo tài khoản quản trị đầu tiên. Chỉ chạy được khi bảng admins đang rỗng. */
+/** Tạo tài khoản quản trị đầu tiên. Chỉ chạy được khi chưa có admin nào. */
 export async function POST(req: Request) {
   try {
     const { email, password, setupCode, fullName } = (await req.json()) as {
@@ -31,7 +31,10 @@ export async function POST(req: Request) {
     }
 
     const db = supabaseAdmin();
-    const { count } = await db.from("admins").select("*", { count: "exact", head: true });
+    const { count } = await db
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("role", "admin");
     if ((count ?? 0) > 0) {
       return NextResponse.json(
         { error: "Đã có quản trị viên. Hãy đăng nhập thay vì thiết lập lại." },
@@ -39,10 +42,12 @@ export async function POST(req: Request) {
       );
     }
 
+    const normalized = email.trim().toLowerCase();
     const { data: created, error: createErr } = await db.auth.admin.createUser({
-      email,
+      email: normalized,
       password,
       email_confirm: true,
+      user_metadata: { full_name: fullName ?? null },
     });
     if (createErr || !created.user) {
       return NextResponse.json(
@@ -51,14 +56,13 @@ export async function POST(req: Request) {
       );
     }
 
-    const { error: insErr } = await db.from("admins").insert({
+    const { error: insErr } = await db.from("profiles").upsert({
       user_id: created.user.id,
-      email,
+      email: normalized,
       full_name: fullName ?? null,
+      role: "admin",
     });
-    if (insErr) {
-      return NextResponse.json({ error: insErr.message }, { status: 400 });
-    }
+    if (insErr) return NextResponse.json({ error: insErr.message }, { status: 400 });
 
     return NextResponse.json({ ok: true });
   } catch (e) {
@@ -73,8 +77,9 @@ export async function POST(req: Request) {
 export async function GET() {
   try {
     const { count } = await supabaseAdmin()
-      .from("admins")
-      .select("*", { count: "exact", head: true });
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("role", "admin");
     return NextResponse.json({ hasAdmin: (count ?? 0) > 0 });
   } catch {
     return NextResponse.json({ hasAdmin: true });
