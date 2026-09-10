@@ -15,9 +15,14 @@ mô tả hình minh hoạ. KHÔNG viết code, KHÔNG giải bài, KHÔNG nêu �
 CHỈ trả về JSON thuần, không bọc trong markdown, không thêm lời dẫn.
 
 Cấu trúc:
-{"title":"...", "objects":[ ... ]}
+{"dim":"2d"|"3d", "title":"...", "objects":[ ... ]}
 
-Các loại đối tượng cho phép (đúng chính tả trường "t"):
+Chọn "dim":
+- "2d" cho hình học phẳng (tam giác, đường tròn, tứ giác…)
+- "3d" cho hình học không gian (hình chóp, lăng trụ, hình hộp, tứ diện, mặt cầu…)
+KHÔNG được trộn đối tượng 2D và 3D trong cùng một hình.
+
+=== ĐỐI TƯỢNG 2D (chỉ dùng khi dim = "2d") ===
 - {"t":"point","id":"A","x":0,"y":0,"label":"A","fixed":false}
 - {"t":"midpoint","id":"M","of":["B","C"],"label":"M"}
 - {"t":"intersection","id":"I","of":["d1","d2"],"which":0,"label":"I"}
@@ -31,14 +36,34 @@ Các loại đối tượng cho phép (đúng chính tả trường "t"):
 - {"t":"parallel","id":"k","line":"BC","through":"A"}
 - {"t":"text","x":1,"y":2,"text":"..."}
 
+=== ĐỐI TƯỢNG 3D (chỉ dùng khi dim = "3d") ===
+- {"t":"point3","id":"S","x":0,"y":0,"z":4,"label":"S"}
+- {"t":"midpoint3","id":"M","of":["B","C"],"label":"M"}
+- {"t":"segment3","id":"SA","from":"S","to":"A","dash":false}
+- {"t":"line3","id":"d","from":"A","to":"B"}          (đường thẳng kéo dài vô hạn)
+- {"t":"face","id":"f1","points":["A","B","C"]}       (một mặt phẳng hữu hạn)
+- {"t":"solid","id":"khoi","faces":[["A","B","C","D"],["S","A","B"],["S","B","C"],
+                                    ["S","C","D"],["S","D","A"]]}
+- {"t":"sphere3","id":"mc","center":"O","through":"A"}  hoặc  "r": 3
+- {"t":"plane3","id":"mp","points":["S","B","C"]}      (mặt phẳng cắt, vô hạn)
+- {"t":"text3","x":1,"y":0,"z":2,"text":"..."}
+
+Với hình chóp / lăng trụ / hình hộp: dùng MỘT đối tượng "solid" liệt kê đủ các mặt.
+Cạnh được vẽ tự động từ các mặt, không cần thêm "segment3" cho từng cạnh.
+Chỉ thêm "segment3" cho các đường phụ (đường cao, trung tuyến, đường nối đặc biệt);
+đường khuất hoặc đường dựng thêm nên đặt "dash": true.
+
+Quy ước toạ độ 3D: mặt phẳng đáy nằm ở z = 0, chiều cao theo trục z dương.
+
 QUY TẮC BẮT BUỘC:
 1. Mọi id phải bắt đầu bằng chữ cái, không trùng nhau.
 2. Chỉ được tham chiếu tới id đã khai báo TRƯỚC ĐÓ trong mảng objects.
-3. Điểm tự do ("point") phải có toạ độ số cụ thể, trong khoảng -20 đến 20,
+3. Điểm tự do ("point" / "point3") phải có toạ độ số cụ thể, trong khoảng -20 đến 20,
    đặt sao cho hình cân đối và dễ nhìn.
 4. Dựng hình phản ánh đúng dữ kiện đề bài. Nếu đề nói tam giác vuông tại A,
    hãy chọn toạ độ thực sự vuông tại A và đánh dấu {"t":"angle",...,"right":true}.
-5. Với đường cao, trung tuyến, đường trung trực: dùng "perpendicular", "midpoint"
+   Nếu đề nói SA vuông góc với đáy, hãy đặt S ngay phía trên A.
+5. Với đường cao, trung tuyến, đường trung trực (2D): dùng "perpendicular", "midpoint"
    thay vì tự tính toạ độ, để hình còn đúng khi học sinh kéo điểm.
 6. Tối đa 40 đối tượng.
 7. KHÔNG đưa vào hình bất cứ thứ gì tiết lộ đáp án (độ dài cần tìm, số đo cần tính).

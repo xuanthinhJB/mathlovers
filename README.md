@@ -11,13 +11,19 @@ Trang web hỗ trợ học sinh học Toán bằng **gợi ý tư duy** — tr�
 - Nhận gợi ý theo 4 bậc, trả lời câu hỏi dẫn dắt, xin "gợi ý sâu hơn" khi bí
 - Công thức toán hiển thị bằng KaTeX
 
-**Vẽ hình hình học**
-- Học sinh bấm "Vẽ hình" → AI đọc đề và trả về **JSON mô tả hình** (điểm, đoạn, đường tròn,
-  đường cao, trung điểm, góc…), máy chủ kiểm tra rồi trình duyệt dựng bằng JSXGraph
-- Hình **kéo thả được**: kéo một đỉnh, các dựng hình phụ thuộc (trung điểm, đường cao, giao
-  điểm) tự cập nhật theo — học sinh tự thấy cái gì bất biến
+**Vẽ hình hình học — phẳng và không gian**
+- Học sinh bấm "Vẽ hình" → AI đọc đề và trả về **JSON mô tả hình**, máy chủ kiểm tra rồi
+  trình duyệt dựng bằng JSXGraph. AI tự chọn `dim`: `2d` hay `3d`.
+- **Hình phẳng** (`2d`): điểm, đoạn, đường thẳng, tia, đường tròn, đa giác, trung điểm,
+  giao điểm, đường vuông góc, đường song song, góc (có ký hiệu góc vuông), nhãn.
+  **Kéo thả được** — kéo một đỉnh thì trung điểm, đường cao, giao điểm tự cập nhật theo.
+- **Hình không gian** (`3d`): điểm, đoạn, đường thẳng, trung điểm, mặt, **khối đa diện**
+  (chóp, lăng trụ, hình hộp — chỉ cần liệt kê các mặt, cạnh vẽ tự động), mặt cầu,
+  mặt phẳng cắt qua ba điểm, nhãn. **Xoay được** bằng chuột, có nút góc nhìn nhanh
+  (nghiêng / nhìn thẳng / nhìn từ trên), tự sắp xếp độ sâu để mặt trước che mặt sau.
 - Model **không sinh code**, chỉ sinh dữ liệu theo schema; `src/lib/figure.ts` từ chối mọi
-  spec sai (id trùng, tham chiếu chưa khai báo, toạ độ vô hạn, loại đối tượng lạ…)
+  spec sai (id trùng, tham chiếu chưa khai báo, toạ độ vô hạn, loại đối tượng lạ, trộn 2D
+  với 3D…)
 - Hình được lưu theo phiên học nên mở lại vẫn còn
 
 **Giáo viên** (`/admin`) — đăng nhập Supabase Auth
