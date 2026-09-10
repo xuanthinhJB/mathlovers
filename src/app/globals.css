@@ -459,3 +459,38 @@ select.field {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ---------------- JSXGraph ----------------
+   Package CSS không export được qua exports map, và phần lớn nó chỉ style
+   thanh điều hướng mà mình đã tắt — nên khai báo tay đúng phần cần thiết. */
+.jxgbox {
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  outline: none;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.jxgbox:focus {
+  outline: none;
+}
+.jxgbox svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.JXGtext {
+  position: absolute;
+  font-family: inherit;
+  padding: 0;
+  margin: 0;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.JXGinfobox,
+.JXG_navigation {
+  display: none !important;
+}

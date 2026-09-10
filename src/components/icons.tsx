@@ -104,6 +104,13 @@ export const IconHome = ({ className, size = 17 }: P) => (
   </svg>
 );
 
+export const IconShapes = ({ className, size = 17 }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M9.2 3.6 15 13.2H3.4Z" />
+    <circle cx="16.6" cy="16.6" r="4.4" />
+  </svg>
+);
+
 export const IconLogo = ({ className, size = 26 }: P) => (
   <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
     <rect width="32" height="32" rx="9" fill="var(--accent)" />

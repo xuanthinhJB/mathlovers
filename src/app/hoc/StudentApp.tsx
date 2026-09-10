@@ -14,10 +14,13 @@ import {
   IconMenu,
   IconPlus,
   IconSend,
+  IconShapes,
   IconSliders,
   IconTrash,
 } from "@/components/icons";
 import CameraCapture, { fileToDataUrl } from "./CameraCapture";
+import FigureBoard from "@/components/FigureBoard";
+import type { FigureSpec } from "@/lib/figure";
 
 interface PublicProblem {
   id: string;
@@ -95,6 +98,10 @@ export default function StudentApp({
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const [figure, setFigure] = useState<FigureSpec | null>(null);
+  const [figureLoading, setFigureLoading] = useState(false);
+  const [figureNote, setFigureNote] = useState<string | null>(null);
+
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const composerRef = useRef<HTMLTextAreaElement>(null);
@@ -151,6 +158,8 @@ export default function StudentApp({
     setImagePreview(null);
     setReply("");
     setError(null);
+    setFigure(null);
+    setFigureNote(null);
     setSidebarOpen(false);
   }
 
@@ -170,6 +179,8 @@ export default function StudentApp({
       setTurns(data.turns ?? []);
       setStreaming("");
       setImagePreview(null);
+      setFigure((data.session.figureSpec as FigureSpec | null) ?? null);
+      setFigureNote(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Không mở được phiên học.");
     } finally {
@@ -301,6 +312,39 @@ export default function StudentApp({
     } finally {
       setLoading(false);
       abortRef.current = null;
+    }
+  }
+
+  async function drawFigure() {
+    if (!problemText.trim()) {
+      setFigureNote("Em nhập đề bài trước nhé.");
+      return;
+    }
+    setFigureLoading(true);
+    setFigureNote(null);
+    try {
+      const res = await fetch("/api/figure", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          problemText,
+          problemId: selectedId || null,
+          sessionId,
+        }),
+      });
+      const data = await res.json();
+      if (data.notGeometry) {
+        setFigure(null);
+        setFigureNote(data.error ?? "Bài này không phải bài hình học.");
+        return;
+      }
+      if (!res.ok) throw new Error(data.error ?? "Không vẽ được hình.");
+      setFigure(data.figure as FigureSpec);
+    } catch (e) {
+      setFigure(null);
+      setFigureNote(e instanceof Error ? e.message : "Không vẽ được hình.");
+    } finally {
+      setFigureLoading(false);
     }
   }
 
@@ -490,6 +534,15 @@ export default function StudentApp({
                       <IconImage size={15} />
                       Tải ảnh
                     </button>
+                    <button
+                      type="button"
+                      className="btn btn-quiet btn-sm"
+                      onClick={drawFigure}
+                      disabled={figureLoading || !problemText.trim()}
+                    >
+                      <IconShapes size={15} />
+                      {figureLoading ? "Đang vẽ…" : "Vẽ hình"}
+                    </button>
                     {problems.length > 0 && (
                       <button
                         type="button"
@@ -527,6 +580,16 @@ export default function StudentApp({
                   </p>
                 )}
 
+                {figureNote && (
+                  <p className="mt-3 text-sm text-[var(--muted)]">{figureNote}</p>
+                )}
+
+                {figure && (
+                  <div className="mt-4 animate-in">
+                    <FigureBoard spec={figure} />
+                  </div>
+                )}
+
                 {showPicker && problems.length > 0 && (
                   <div className="card mt-3 max-h-72 overflow-y-auto p-1.5 animate-in">
                     {problems.map((p) => (
@@ -559,12 +622,22 @@ export default function StudentApp({
           ) : (
             <div className="mx-auto max-w-3xl px-4 py-6">
               {problemText && (
-                <div className="card mb-6 bg-[var(--surface-2)] p-4">
+                <div className="card mb-4 bg-[var(--surface-2)] p-4">
                   <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--faint)]">
                     Đề bài
                   </div>
                   <Markdown>{problemText}</Markdown>
                 </div>
+              )}
+
+              {figure && (
+                <div className="mb-6 animate-in">
+                  <FigureBoard spec={figure} />
+                </div>
+              )}
+
+              {figureNote && !figure && (
+                <p className="mb-6 text-sm text-[var(--muted)]">{figureNote}</p>
               )}
 
               <div className="space-y-6">
@@ -642,6 +715,15 @@ export default function StudentApp({
                 >
                   <IconLightbulb size={15} />
                   Gợi ý sâu hơn
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={drawFigure}
+                  disabled={figureLoading}
+                >
+                  <IconShapes size={15} />
+                  {figureLoading ? "Đang vẽ…" : figure ? "Vẽ lại hình" : "Vẽ hình"}
                 </button>
                 <button type="button" className="btn btn-quiet btn-sm ml-auto" onClick={newChat}>
                   <IconPlus size={15} />

@@ -6,11 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:figure": "node --experimental-strip-types scripts/check-figure.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.6",
     "@supabase/supabase-js": "^2.116.0",
+    "jsxgraph": "^1.13.3",
     "katex": "^0.18.7",
     "next": "16.3.4",
     "react": "19.2.8",

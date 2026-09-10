@@ -15,7 +15,7 @@ export async function GET(_req: Request, { params }: Ctx) {
   const db = supabaseAdmin();
   const { data: session } = await db
     .from("study_sessions")
-    .select("id, user_id, problem_id, problem_text, created_at")
+    .select("id, user_id, problem_id, problem_text, figure_spec, created_at")
     .eq("id", id)
     .maybeSingle();
 
@@ -44,6 +44,7 @@ export async function GET(_req: Request, { params }: Ctx) {
       id: session.id,
       problemId: session.problem_id,
       problemText: session.problem_text,
+      figureSpec: session.figure_spec ?? null,
       hintLevel: lastLevel,
     },
     turns,

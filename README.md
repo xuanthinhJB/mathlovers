@@ -11,6 +11,15 @@ Trang web hỗ trợ học sinh học Toán bằng **gợi ý tư duy** — tr�
 - Nhận gợi ý theo 4 bậc, trả lời câu hỏi dẫn dắt, xin "gợi ý sâu hơn" khi bí
 - Công thức toán hiển thị bằng KaTeX
 
+**Vẽ hình hình học**
+- Học sinh bấm "Vẽ hình" → AI đọc đề và trả về **JSON mô tả hình** (điểm, đoạn, đường tròn,
+  đường cao, trung điểm, góc…), máy chủ kiểm tra rồi trình duyệt dựng bằng JSXGraph
+- Hình **kéo thả được**: kéo một đỉnh, các dựng hình phụ thuộc (trung điểm, đường cao, giao
+  điểm) tự cập nhật theo — học sinh tự thấy cái gì bất biến
+- Model **không sinh code**, chỉ sinh dữ liệu theo schema; `src/lib/figure.ts` từ chối mọi
+  spec sai (id trùng, tham chiếu chưa khai báo, toạ độ vô hạn, loại đối tượng lạ…)
+- Hình được lưu theo phiên học nên mở lại vẫn còn
+
 **Giáo viên** (`/admin`) — đăng nhập Supabase Auth
 - Soạn bài toán: đề, chủ đề, độ khó, **system prompt gợi ý riêng từng bài**, hướng tiếp cận,
   lỗi thường gặp, đáp án (chỉ AI thấy để đối chiếu)
@@ -37,6 +46,13 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ADMIN_SETUP_CODE=
+```
+
+## Kiểm thử
+
+```bash
+npm run check:figure        # validator hình học
+npm i -D playwright && npm run check:figure   # thêm phần dựng hình thật trong Chromium
 ```
 
 ## Chạy local
